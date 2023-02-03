@@ -42,7 +42,7 @@ def analyze_words(pattern, misplaced_chars, forbidden_chars):
     res += f'<h3>best word: {best_word}</h3>'
 
     res += '<h3>next words:</h3><p>'
-    for(w,score) in matching_words.most_common(min(len(matching_words), 10)):
+    for(w,score) in matching_words.most_common(min(len(matching_words), 30)):
         res += f'{w}, freq:{get_char_scores(w, char_freq)}<br>'
     res += '</p>'
 
