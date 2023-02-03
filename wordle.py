@@ -34,45 +34,52 @@ def replace_special_chars(word):
 
 
 ###########################################################
-def valid(word, pattern):
+def valid(word, pattern, misplaced_chars, forbidden_chars, report_errors = False):
 
-    p = pattern.split()
-
-    # print(f'w:{word}, pt:{pattern}')
+    # print(f'w:{word}, pt:{pattern}, misplaced:{misplaced_chars}, forbidden:{forbidden_chars}')
 
     # check whether pattern is valid
-    if (len(p[0]) != 5):
-        print(f'Pattern not valid; first word ({p[0]}) must have five chars')
+    if (len(pattern) != 5):
+        print(f'Pattern not valid; first word ({pattern}) must have five chars')
         return False
-    if (len(p) != 6):
-        print(f'Pattern not valid; it contains {len(p)} instead of 6')
+    if (len(misplaced_chars) != 5):
+        print(f'Pattern not valid; it contains {len(misplaced_chars)} instead of 6')
         return False
 
     # transform word to a version with special Czech characters replaced
     word2 = replace_special_chars(word)
 
     # check the first word for right characters
-    right_chars = p[0]
-    indices_wrong = [i for i in range(5) if right_chars[i] in ALPHABET_FULL and right_chars[i] != word2[i]]
+    indices_wrong = [i for i in range(5) if pattern[i] in ALPHABET_FULL and pattern[i] != word2[i]]
     if len(indices_wrong):
-        # print(f'false type 1 (indices_wrong: {indices_wrong})')
+        if report_errors:
+            print(f'false type 1 (indices_wrong: {indices_wrong})')
         return False
 
     # check that word does not contain char from p[i+1] on place i
     for i in range(5):
-        if right_chars[i] not in ALPHABET_FULL:
+        if pattern[i] not in ALPHABET_FULL:
             # only checked if p[i+1] is relevant, i.e. if the character on the given place is not known yet
-            w = p[i+1]
+            w = misplaced_chars[i]
             indices_wrong = [c for c in w if word[i] == c]
             if len(indices_wrong):
-                # print(f'false type 2 (indices_wrong: {indices_wrong})')
+                if report_errors:
+                    print(f'false type 2 (indices_wrong: {indices_wrong})')
                 return False
 
     # check that all characters from p[i+1] are in word on other places than those covered by th
-    represented_chars = set([c for c in ''.join(p[1:]) if c in ALPHABET_FULL])
-    remaining_chars = set([c for c,rc in zip(word, right_chars) if c != rc])
+    represented_chars = set([c for c in ''.join(misplaced_chars) if c in ALPHABET_FULL])
+    remaining_chars = set([c for c,rc in zip(word, pattern) if c != rc])
     if not represented_chars.issubset(remaining_chars):
-        # print(f'false type 3 (rep_chars:{"".join(represented_chars)} is not subset of rem_chars:{"".join(remaining_chars)})')
+        if report_errors:
+            print(f'false type 3 (rep_chars:{"".join(represented_chars)} is not subset of rem_chars:{"".join(remaining_chars)})')
+        return False
+
+    # check that the word does not contain forbidden characters
+    word_chars = set(word)
+    if len(set(forbidden_chars).intersection(word_chars)):
+        if report_errors:
+            print(f'false type 4 (word contains forbidden chars:{"".join(forbidden_chars)}')
         return False
 
     return True
@@ -105,18 +112,18 @@ def update_freq(word, char_freq):
 
 
 ###########################################################
-def main(guessed_word, char_combinations):
+def main(pattern, misplaced_chars, forbidden_chars):
     """
-    guessed_word - five char string consisting of ALPHABET_FULL or other
-    characters such as '-'. Characters represent known 
-    char_combination - list of five non-empty character sets consisting of ALPHABET or
+    pattern - five char string consisting of ALPHABET_FULL or other
+    characters such as '-'.
+    misplaced_chars - list of five non-empty character sets consisting of ALPHABET or
     other character such as '-'. X in char_combination[i] means that the
     hidden word must contain X, but not on position i.
-    Example: guessed_word = 'sp---' and char_combinations = ['-','-','-','i','c']
-    means that the hidden word starts with sp and contains i and c whereas 
-    must not be on 4-th position and c must not be on 5-th"""
-
-    pattern = guessed_word + ' ' + ' '.join(char_combinations)
+    forbiden_chars - must not appear in the word
+    Example: pattern = 'sp---' and miplaced_chars = ['-','-','-','i','c'] and 
+    forbidden_chars = 'xqs' means that the hidden word starts with 'sp' and contains 'i' 
+    and 'c' whereas 'i' must not be on 4-th position and 'c' must not be on 5-th
+    and the hidden word does not contain 'xqs' on any position"""
 
     char_freq = [Counter(), Counter(), Counter(), Counter(), Counter()]
     # a list of five counters; each counter counts occurences of a given 
@@ -126,7 +133,7 @@ def main(guessed_word, char_combinations):
     words = load_words()
     valid_words = []
     for w in words:
-        if valid(w, pattern):
+        if valid(w, pattern, misplaced_chars, forbidden_chars):
             valid_words.append(w)
             update_freq(w, char_freq)
 
@@ -145,7 +152,7 @@ def main(guessed_word, char_combinations):
     print(f'valid words: {len(matching_words)}')
     print(best_word)
     print()
-    for(w,score) in matching_words.most_common(30):
+    for(w,score) in matching_words.most_common(10):
         print(f'{w}, freq:{get_char_scores(w, char_freq)}')
 
 
@@ -154,12 +161,25 @@ def main(guessed_word, char_combinations):
 ###########################################################
 def test_valid():
 
-    t = [('hrnec', '----- - - - - -', True), ('hrnec', 'b---- - - - - -', False), ('hrnec', '-rn-- efg - - - -', False), 
-         ('hrnec', 'h---- - - - - -', True), ('hrnec', 'h---- nec - - - -', True), ('hrnec', 'h---- - nec - - -', True),
-         ('padák', 'p--a- - - a - -', True), ('pedál', 'p--a- - - a - -', False)] 
+    # t = [('hrnec', '-----', '- - - - -', True), ('hrnec', 'b---- - - - - -', False), ('hrnec', '-rn-- efg - - - -', False), 
+    #      ('hrnec', 'h---- - - - - -', True), ('hrnec', 'h---- nec - - - -', True), ('hrnec', 'h---- - nec - - -', True),
+    #      ('padák', 'p--a- - - a - -', True), ('pedál', 'p--a- - - a - -', False)] 
 
-    for (word, pattern, expected) in t:
-        res = valid(word, pattern)
+    t = [
+        ('hrnec', '-----', '- - - - -', '', True), 
+        ('hrnec', 'b----', '- - - - -', '', False), 
+        ('hrnec', '-rn--', 'efg - - - -', '', False), 
+        ('hrnec', 'h----', '- - - - -', '', True), 
+        ('hrnec', 'h----', 'nec - - - -', '', True),
+        ('hrnec', 'h----', '- nec - - -', '', True),
+        ('padák', 'p--a-', '- - a - -', '', True),
+        ('pedál', 'p--a-', '- - a - -', '', False),
+        ('pedál', 'p--a-', '- - a - -', 'k', False),
+        ('padák', 'p--a-', '- - a - -', 'k', False),
+    ]
+
+    for (word, pattern, misplaced_chars, forbidden_chars, expected) in t:
+        res = valid(word, pattern, misplaced_chars.split(), forbidden_chars)
         if expected == res:
             print(f'word:{word}, pattern:{pattern}, res:{res}')
         else:
@@ -169,5 +189,9 @@ def test_valid():
 
 
 ###########################################################
-main('-----',['-','a','-','e','-'])
+
+main('po---',['-','a','-','e','-'], 'xbe')
+main('po---',['-','-','-','-','-'], 'stk')
+
+# test_valid()
 
