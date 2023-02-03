@@ -71,10 +71,11 @@ def test_valid():
         ('pedál', 'p--a-', '- - a - -', '', False),
         ('pedál', 'p--a-', '- - a - -', 'k', False),
         ('padák', 'p--a-', '- - a - -', 'k', False),
+        ('aréna', '---na', '- ae - - -', '', True),
     ]
 
     for (word, pattern, misplaced_chars, forbidden_chars, expected) in t:
-        res = valid(word, pattern, misplaced_chars.split(), forbidden_chars)
+        res = valid(word, pattern, misplaced_chars.split(), forbidden_chars, report_errors=True)
         if expected == res:
             print(f'word:{word}, pattern:{pattern}, res:{res}')
         else:
@@ -85,7 +86,7 @@ def test_valid():
 
 ###########################################################
 
-main('po---',['-','-','-','-','-'], 'stk')
+# main('po---',['-','-','-','-','-'], 'stk')
 
-# test_valid()
+test_valid()
 

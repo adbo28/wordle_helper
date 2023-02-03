@@ -62,7 +62,7 @@ def valid(word, pattern, misplaced_chars, forbidden_chars, report_errors = False
         if pattern[i] not in ALPHABET_FULL:
             # only checked if p[i+1] is relevant, i.e. if the character on the given place is not known yet
             w = misplaced_chars[i]
-            indices_wrong = [c for c in w if word[i] == c]
+            indices_wrong = [c for c in w if word2[i] == c]
             if len(indices_wrong):
                 if report_errors:
                     print(f'false type 2 (indices_wrong: {indices_wrong})')
@@ -70,14 +70,14 @@ def valid(word, pattern, misplaced_chars, forbidden_chars, report_errors = False
 
     # check that all characters from p[i+1] are in word on other places than those covered by th
     represented_chars = set([c for c in ''.join(misplaced_chars) if c in ALPHABET_FULL])
-    remaining_chars = set([c for c,rc in zip(word, pattern) if c != rc])
+    remaining_chars = set([c for c,rc in zip(word2, pattern) if c != rc])
     if not represented_chars.issubset(remaining_chars):
         if report_errors:
             print(f'false type 3 (rep_chars:{"".join(represented_chars)} is not subset of rem_chars:{"".join(remaining_chars)})')
         return False
 
     # check that the word does not contain forbidden characters
-    word_chars = set(replace_special_chars(word))
+    word_chars = set(word2)
     if len(set(forbidden_chars).intersection(word_chars)):
         if report_errors:
             print(f'false type 4 (word contains forbidden chars:{"".join(forbidden_chars)}')
