@@ -228,8 +228,10 @@ darda
 dáseň
 dativ
 datle
+dálka
 dávka
 debut
+debil
 decil
 dečka
 děják
@@ -1256,6 +1258,7 @@ rolák
 rolba
 román
 rosol
+roští
 rotor
 roura
 routa
@@ -1345,6 +1348,7 @@ sféra
 shluk
 shoda
 schod
+sídlo
 siena
 sifon
 sifón
@@ -1514,6 +1518,7 @@ syžet
 šeřík
 ševel
 šička
+šídlo
 šifon
 šifón
 šifra
@@ -1538,7 +1543,6 @@ syžet
 šňůra
 šopka
 šperk
-špice
 špice
 špína
 špíže
@@ -1892,6 +1896,7 @@ záběh
 záběr
 zábor
 zácpa
+zadák
 zádrž
 záfuk
 záhon
