@@ -56,10 +56,6 @@ def main(pattern, misplaced_chars, forbidden_chars):
 ###########################################################
 def test_valid():
 
-    # t = [('hrnec', '-----', '- - - - -', True), ('hrnec', 'b---- - - - - -', False), ('hrnec', '-rn-- efg - - - -', False), 
-    #      ('hrnec', 'h---- - - - - -', True), ('hrnec', 'h---- nec - - - -', True), ('hrnec', 'h---- - nec - - -', True),
-    #      ('padák', 'p--a- - - a - -', True), ('pedál', 'p--a- - - a - -', False)] 
-
     t = [
         ('hrnec', '-----', '- - - - -', '', True), 
         ('hrnec', 'b----', '- - - - -', '', False), 
@@ -86,7 +82,7 @@ def test_valid():
 
 ###########################################################
 
-# main('po---',['-','-','-','-','-'], 'stk')
+main('----n',['-','-','-','-','-'], '')
 
-test_valid()
+# test_valid()
 

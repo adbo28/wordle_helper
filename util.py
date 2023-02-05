@@ -9,8 +9,6 @@ ALPHABET_FULL =     'aábcčdďeěéfghiíjklmnňoópqrřsštťuůúvwxyýzž'
 ALPHABET_MAPPING =  'aabccddeeefghiijklmnnoopqrrssttuuuvwxyyzz'
 
 FILENAME = 'slovnik5.txt'
-# FILENAME = 'slovnik_test.txt'
-
 
 
 ###########################################################
@@ -37,8 +35,6 @@ def replace_special_chars(word):
 ###########################################################
 def valid(word, pattern, misplaced_chars, forbidden_chars, report_errors = False):
 
-    # print(f'w:{word}, pt:{pattern}, misplaced:{misplaced_chars}, forbidden:{forbidden_chars}')
-
     # check whether pattern is valid
     if (len(pattern) != 5):
         print(f'Pattern not valid; first word ({pattern}) must have five chars')
@@ -51,7 +47,7 @@ def valid(word, pattern, misplaced_chars, forbidden_chars, report_errors = False
     word2 = replace_special_chars(word)
 
     # check the first word for right characters
-    indices_wrong = [i for i in range(5) if pattern[i] in ALPHABET_FULL and pattern[i] != word2[i]]
+    indices_wrong = [i for i in range(5) if pattern[i] in ALPHABET_FULL and pattern[i] != word[i]]
     if len(indices_wrong):
         if report_errors:
             print(f'false type 1 (indices_wrong: {indices_wrong})')
@@ -102,11 +98,16 @@ def get_char_scores(word, char_freq):
 
 ###########################################################
 def calc_score(word, char_freq):
+    """Calculates score for a given word a sum of squares of the score
+    of each characted."""
     return sum([x**2 for x in get_char_scores(word, char_freq)])
 
 
 ###########################################################
 def update_freq(word, char_freq):
+    """char_freq is a list of five Counters that maintain information
+    about the frequencies of particular characters at the given position.
+    This function updates the frequencies based on the given word."""
     word2 = replace_special_chars(word)
     for c, cntr in zip(word2, char_freq):
         cntr[c] += 1
